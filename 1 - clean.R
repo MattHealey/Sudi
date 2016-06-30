@@ -33,6 +33,7 @@ head(sudi)
 
 # NAs?
 ##
+# rename foo to sudi to run with NA removed set
 row.has.na <- apply(sudi, 1, function(x){any(is.na(x))}); sum(row.has.na);foo <- sudi[!row.has.na,]; rm(row.has.na)
 #[1] 167
 ##
@@ -89,7 +90,7 @@ addmargins(table(sudi$sex, sudi$sudi, exclude = NULL))
 #Sum  785567    733      0 786300
 #
 ##
-# 7 sneaky ones in sudi$bw and levels need cl
+# 7 sneaky ones in sudi$bw and levels need cleaning and ordering
 addmargins(table(sudi$bw, sudi$sudi, exclude = NULL))
 #               0      1   <NA>    Sum
 #<1000       3735      6      0   3741
@@ -154,6 +155,35 @@ addmargins(table(sudi$dhb, sudi$sudi, exclude = NULL))
 ###
 # Fix levels
 ##
+# BW
+levels(sudi$bw)
+#[1] "<1000"     ">=4500"    "1000-1499" "1500-1999" "2000-2499" "2500-2999" "3000-3499" "3500-3999" "4000-4499"
+#[10] "o"         "Unknown"
+levels(sudi$bw) <- list("<1000" = "<1000",    ">=4500" = ">=4500",   "1000-1499" = "1000-1499",
+                        "1500-1999" = "1500-1999", "2000-2499" = "2000-2499", "2500-2999" = "2500-2999",
+                        "3000-3499" = "3000-3499", "3500-3999" = "3500-3999", "4000-4499" = "4000-4499",
+                        "Unknown" = c("o", "Unknown"))
+sudi  <- droplevels(sudi)
+levels(sudi$bw)
+addmargins(table(sudi$bw, sudi$sudi, exclude = NULL))
+#               0      1   <NA>    Sum
+#<1000       3721      6      0   3727
+#>=4500     20969      2      0  20971
+#1000-1499   4651     11      0   4662
+#1500-1999   9366     23      0   9389
+#2000-2499  29037     61      0  29098
+#2500-2999 105743    125      0 105868
+#3000-3499 259611    201      0 259812
+#3500-3999 252212    114      0 252326
+#4000-4499  98030     30      0  98060
+#Unknown      670      1      0    671
+#<NA>           0      0      0      0
+#Sum       784010    574      0 784584
+##
+# BW END
+###
+
+##
 # DEP
 #
 levels(sudi$dep)
@@ -161,14 +191,16 @@ levels(sudi$dep)
 levels(sudi$dep)  <- list("01-08" = c("1","2","3","4","5","6","7","8"),
                             "09-10" = c("9","10"),
                             "Unknown" = "0")
-#sudi  <-  sudi[sudi$dep  != "Unknown",]
-#sudi  <- droplevels(sudi)
+sudi  <- droplevels(sudi)
 levels(sudi$dep)
 #[1] "01-08" "09-10"
 addmargins(table(sudi$dep, sudi$sudi, exclude = NULL))
-#           0      1
-#01-08 573487    351
-#09-10 211074    381
+#             0      1   <NA>    Sum
+#01-08   573487    351      0 573838
+#09-10   211074    381      0 211455
+#Unknown   1006      0      0   1006
+#<NA>         0      1      0      1
+#Sum     785567    733      0 786300
 ##
 # DEP DONE
 ###
@@ -176,21 +208,23 @@ addmargins(table(sudi$dep, sudi$sudi, exclude = NULL))
 ###
 # ETH
 ##
-levels(sudi$EthPrio)
+levels(sudi$eth)
 #[1] "Asian"           "European"        "Maori"           "MELAA"           "Other"           "Pacific Peoples" "Unknown"
-levels(sudi$EthPrio)  <- list("Maori" = "Maori",
+levels(sudi$eth)  <- list("Maori" = "Maori",
                               "European or other" = c("European", "Asian", "MELAA", "Other"),
                               "Pacific" = "Pacific Peoples",
                               "Unknown" = "Unknown")
-#sudi  <-  sudi[sudi$EthPrio  != "Unknown",]
-#sudi  <- droplevels(sudi)
-levels(sudi$EthPrio)
+sudi  <- droplevels(sudi)
+levels(sudi$eth)
 #[1] "Maori"             "European or other" "Pacific"
-addmargins(table(sudi$EthPrio, sudi$SUDI, exclude = NULL))
-#                       0      1
-#Maori             227142    495
-#European or other 472449    146
-#Pacific            85394     91
+addmargins(table(sudi$eth, sudi$sudi, exclude = NULL))
+#                       0      1   <NA>    Sum
+#Maori             227142    495      0 227637
+#European or other 472449    146      0 472595
+#Pacific            85394     91      0  85485
+#Unknown              582      1      0    583
+#<NA>                   0      0      0      0
+#Sum               785567    733      0 786300
 ##
 # ETH DONE
 ###
@@ -198,48 +232,40 @@ addmargins(table(sudi$EthPrio, sudi$SUDI, exclude = NULL))
 ###
 # DHB
 ##
-levels(sudi$DHBRes)
+levels(sudi$dhb)
 #[1]  "Auckland"           "Bay of Plenty"      "Canterbury"         "Capital & Coast"    "Capital and Coast"
 #[6]  "Counties Manukau"   "Hawke's Bay"        "Hutt"               "Lakes"              "MidCentral"
 #[11] "Nelson Marlborough" "Northland"          "Otago"              "South Canterbury"   "Southern"
 #[16] "Southland"          "Tairawhiti"         "Taranaki"           "Waikato"            "Wairarapa"
 #[21] "Waitemata"          "West Coast"         "Whanganui"
-levels(sudi$DHBRes) <- list("Nothern" = c("Auckland","Waitemata","Northland","Counties Manukau"),
+levels(sudi$dhb) <- list("Nothern" = c("Auckland","Waitemata","Northland","Counties Manukau"),
                             "Midland" = c("Waikato","Lakes","Bay of Plenty","Tairawhiti","Taranaki"),
                             "Central" = c("Hawke's Bay","MidCentral","Whanganui","Capital & Coast", "Capital and Coast",
                                           "Hutt","Wairarapa"),
                             "Southern"= c("Nelson Marlborough","West Coast","Canterbury","South Canterbury","Southern",
                                           "Otago","Southland"),
                             "Unknown" = "Unknown")
-#sudi  <-  sudi[sudi$DHBRes  != "Unknown",]
-#sudi  <- droplevels(sudi)
-levels(sudi$DHBRes)
+sudi  <- droplevels(sudi)
+levels(sudi$dhb)
 #[1] "Nothern"  "Midland"  "Central"  "Southern"
-addmargins(table(sudi$DHBRes, sudi$SUDI, exclude = NULL))
-#              0      1
-#Nothern  317168    299
-#Midland  155451    192
-#Central  152117    151
-#Southern 159825     90
+addmargins(table(sudi$dhb, sudi$sudi, exclude = NULL))
+#              0      1   <NA>    Sum
+#Nothern  317191    299      0 317490
+#Midland  155459    192      0 155651
+#Central  152124    151      0 152275
+#Southern 159837     91      0 159928
+#Unknown     956      0      0    956
+#<NA>          0      0      0      0
+#Sum      785567    733      0 786300
 ##
 # DHB DONE
 ####
-
 ##
 # Deal with missing data
-row.has.na <- apply(sudi, 1, function(x){any(is.na(x))}); sum(row.has.na);foo <- sudi[!row.has.na,]; rm(row.has.na)
+row.has.na <- apply(sudi, 1, function(x){any(is.na(x))}); sum(row.has.na);sudi <- sudi[!row.has.na,]; rm(row.has.na,foo)
 ##
-
-t.test(sudi$mage[sudi$SUDI != 1], sudi$mage[sudi$SUDI == 1])
-#Welch Two Sample t-test
-#
-#data:  sudi$mage[sudi$SUDI != 1] and sudi$mage[sudi$SUDI == 1]
-#t = 15.01, df = 574.84, p-value < 2.2e-16
-#alternative hypothesis: true difference in means is not equal to 0
-#95 percent confidence interval:
-#     3.357628 4.368594
-#sample estimates:
-#     mean of x mean of y
-#      29.22485  25.36174
-#
-s1 <- glm(SUDI ~ YearOfDeath + BW.Calc + DHBRes + Dep06 + Sex + EthPrio + magecat, data = sudi, family = "binomial")
+#sudi  <-  sudi[sudi$dep  != "Unknown",]
+#sudi  <-  sudi[sudi$dhb  != "Unknown",]
+#sudi  <-  sudi[sudi$eth  != "Unknown",]
+#sudi  <-  sudi[sudi$bw  != "Unknown",]
+#sudi <- droplevels(sudi)

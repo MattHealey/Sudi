@@ -6,8 +6,8 @@ age <- function(dob, age.day, units = "years", floor = TRUE) {
      if (floor) return(as.integer(floor(calc.age)))
      return(calc.age)
 }
-sudi$mage <- age(dob = sudi$MDOB, age.day = sudi$DOB)
-addmargins(table(sudi$mage, sudi$SUDI, exclude = NULL))
+sudi$mage <- age(dob = sudi$mdob, age.day = sudi$dob)
+addmargins(table(sudi$mage, sudi$sudi, exclude = NULL))
 #          0      1   <NA>    Sum
 #11        1      0      0      1
 #12        5      0      0      5
@@ -72,7 +72,7 @@ age.cat <- function(x, lower = 0, upper, by = 5,
      cut(floor(x), breaks = c(seq(lower, upper, by = by), Inf),
          right = FALSE, labels = labs)
 }
-addmargins(table(age.cat(sudi$mage, lower = 10,upper = 80), sudi$SUDI, exclude = NULL))
+addmargins(table(age.cat(sudi$mage, lower = 10,upper = 80), sudi$sudi, exclude = NULL))
 #           0      1   <NA>    Sum
 #10-14    403      2      0    405
 #15-19  53421    108      0  53529
@@ -102,7 +102,7 @@ levels(sudi$magecat)  <- list(">20"   = c("10-14","15-19"),
                               "<40" = c("40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79","80+"))
 sudi <- droplevels(sudi)
 levels(sudi$magecat)
-addmargins(table(sudi$magecat, sudi$SUDI, exclude = NULL))
+addmargins(table(sudi$magecat, sudi$sudi, exclude = NULL))
 #           0      1   <NA>    Sum
 #>20    53824    110      0  53934
 #20-24 140062    193      0 140255
@@ -112,3 +112,17 @@ addmargins(table(sudi$magecat, sudi$SUDI, exclude = NULL))
 #<40    30901      8      0  30909
 #<NA>       8    158      0    166
 #Sum   785567    733      0 786300
+
+t.test(sudi$mage[sudi$sudi != 1], sudi$mage[sudi$sudi == 1])
+#Welch Two Sample t-test
+#
+#data:  sudi$mage[sudi$SUDI != 1] and sudi$mage[sudi$SUDI == 1]
+#t = 14.961, df = 573.84, p-value < 2.2e-16
+#alternative hypothesis: true difference in means is not equal to 0
+#95 percent confidence interval:
+#     3.349368 4.361657
+#sample estimates:
+#     mean of x mean of y
+#      29.22485  25.36174
+#
+summary(s1 <- glm(sudi ~ yod + bw + dhb + dep + sex + eth, data = sudi, family = "binomial"))
