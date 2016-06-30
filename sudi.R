@@ -19,139 +19,19 @@ sudi$DOB <- as.Date(sudi$DOB)
 sudi$MDOB <- as.Date(sudi$MDOB)
 sudi$YearOfDeath <- as.factor(sudi$YearOfDeath)
 sudi$Dep06 <- as.factor(sudi$Dep06)
+sudi$MDOB <- NULL; sudi$DOB <- NULL; sudi$birth.weight <- NULL
 head(sudi)
-#  YearOfDeath           DOB   BW.Calc birth.weight   DHBRes Dep06 Sex         EthPrio     MDOB SUDI
-#1        2002 21/04/00 0:00 3500-3999         3500 Auckland    10   F           Maori 29/03/68    0
-#2        2002  9/05/00 0:00 4000-4499         4105 Auckland    10   F           Maori  2/01/67    0
-#3        2002 14/05/00 0:00 4000-4499         4050 Auckland     9   F           Maori 30/07/72    0
-#4        2002 10/06/00 0:00 2500-2999         2520 Auckland     3   F        European 23/03/62    0
-#5        2002 24/06/00 0:00 3500-3999         3650 Auckland     9   F Pacific Peoples 10/09/76    0
-#6        2002  6/07/00 0:00 3500-3999         3970 Auckland     5   M           Maori  3/01/83    0
-age <- function(dob, age.day, units = "years", floor = TRUE) {
-     calc.age = interval(dob, age.day) / duration(num = 1, units = units)
-     if (floor) return(as.integer(floor(calc.age)))
-     return(calc.age)
-}
-sudi$mage <- age(dob = sudi$MDOB, age.day = sudi$DOB)
+#  YearOfDeath   BW.Calc   DHBRes Dep06 Sex         EthPrio SUDI
+#1        2002 3500-3999 Auckland    10   F           Maori    0
+#2        2002 4000-4499 Auckland    10   F           Maori    0
+#3        2002 4000-4499 Auckland     9   F           Maori    0
+#4        2002 2500-2999 Auckland     3   F        European    0
+#5        2002 3500-3999 Auckland     9   F Pacific Peoples    0
+#6        2002 3500-3999 Auckland     5   M           Maori    0
+
 addmargins(table(sudi$SUDI, exclude = NULL))
-#     0      1   <NA>    Sum 
-#785567    733      0 786300 
-# check un-categorised maternal age
-addmargins(table(sudi$mage, sudi$SUDI, exclude = NULL))
-#          0      1   <NA>    Sum
-#11        1      0      0      1
-#12        5      0      0      5
-#13       51      1      0     52
-#14      346      1      0    347
-#15     1469      4      0   1473
-#16     4727     10      0   4737
-#17    10123     16      0  10139
-#18    15782     28      0  15810
-#19    21320     50      0  21370
-#20    24198     21      0  24219
-#21    25881     48      0  25929
-#22    28255     48      0  28303
-#23    30101     42      0  30143
-#24    31627     34      0  31661
-#25    33389     34      0  33423
-#26    35970     27      0  35997
-#27    38673     28      0  38701
-#28    42016     26      0  42042
-#29    44883     13      0  44896
-#30    46152     16      0  46168
-#31    48188     19      0  48207
-#32    47798     11      0  47809
-#33    45252     17      0  45269
-#34    42327     20      0  42347
-#35    38152     16      0  38168
-#36    32664     16      0  32680
-#37    27024      8      0  27032
-#38    21543      5      0  21548
-#39    16741      8      0  16749
-#40    11980      4      0  11984
-#41     7994      0      0   7994
-#42     5029      0      0   5029
-#43     2885      2      0   2887
-#44     1544      1      0   1545
-#45      781      1      0    782
-#46      360      0      0    360
-#47      157      0      0    157
-#48       86      0      0     86
-#49       30      0      0     30
-#50       18      0      0     18
-#51       17      0      0     17
-#52        5      0      0      5
-#53        4      0      0      4
-#54        1      0      0      1
-#55        3      0      0      3
-#56        2      0      0      2
-#57        1      0      0      1
-#64        1      0      0      1
-#65        2      0      0      2
-#70        1      0      0      1
-#<NA>      8    158      0    166
-#Sum  785567    733      0 786300
-subset(sudi, is.na(sudi$mage))
-head(sudi)
-#  YearOfDeath        DOB   BW.Calc birth.weight   DHBRes Dep06 Sex         EthPrio       MDOB SUDI mage
-#1        2002 2000-04-21 3500-3999         3500 Auckland    10   F           Maori 1968-03-29    0   32
-#2        2002 2000-05-09 4000-4499         4105 Auckland    10   F           Maori 1967-01-02    0   33
-#3        2002 2000-05-14 4000-4499         4050 Auckland     9   F           Maori 1972-07-30    0   27
-#4        2002 2000-06-10 2500-2999         2520 Auckland     3   F        European 1962-03-23    0   38
-#5        2002 2000-06-24 3500-3999         3650 Auckland     9   F Pacific Peoples 1976-09-10    0   23
-#6        2002 2000-07-06 3500-3999         3970 Auckland     5   M           Maori 1983-01-03    0   17
-## create factor for mage
-age.cat <- function(x, lower = 0, upper, by = 5,
-                    sep = "-", above.char = "+") {
-  
-  labs <- c(paste(seq(lower, upper - by, by = by),
-                  seq(lower + by - 1, upper - 1, by = by),
-                  sep = sep),
-            paste(upper, above.char, sep = ""))
-  
-  cut(floor(x), breaks = c(seq(lower, upper, by = by), Inf),
-      right = FALSE, labels = labs)
-}
-addmargins(table(age.cat(sudi$mage, lower = 10,upper = 80), sudi$SUDI, exclude = NULL))
-#           0      1   <NA>    Sum
-#10-14    403      2      0    405
-#15-19  53421    108      0  53529
-#20-24 140062    193      0 140255
-#25-29 194931    128      0 195059
-#30-34 229717     83      0 229800
-#35-39 136124     53      0 136177
-#40-44  29432      7      0  29439
-#45-49   1414      1      0   1415
-#50-54     45      0      0     45
-#55-59      6      0      0      6
-#60-64      1      0      0      1
-#65-69      2      0      0      2
-#70-74      1      0      0      1
-#75-79      0      0      0      0
-#80+        0      0      0      0
-#<NA>       8    158      0    166
-#Sum   785567    733      0 786300
-sudi$magecat <- age.cat(sudi$mage, lower = 10,upper = 80)
-levels(sudi$magecat)
-#[1] "10-14" "15-19" "20-24" "25-29" "30-34" "35-39" "40-44" "45-49" "50-54" "55-59" "60-64" "65-69" "70-74" "75-79" "80+"  
-levels(sudi$magecat)  <- list(">20"   = c("10-14","15-19"),
-                            "20-24" = "20-24",
-                            "25-29" = "25-29",
-                            "30-34" = "30-34",
-                            "35-39" = "35-39",
-                            "<40" = c("40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79","80+"))
-sudi <- droplevels(sudi)
-levels(sudi$magecat)
-addmargins(table(sudi$magecat, sudi$SUDI, exclude = NULL))
-#           0      1   <NA>    Sum
-#>20    53824    110      0  53934
-#20-24 140062    193      0 140255
-#25-29 194931    128      0 195059
-#30-34 229717     83      0 229800
-#35-39 136124     53      0 136177
-#<40    30901      8      0  30909
-#<NA>       8    158      0    166
-#Sum   785567    733      0 786300
+#     0      1   <NA>    Sum
+#785567    733      0 786300
 addmargins(table(sudi$YearOfDeath, sudi$SUDI, exclude = NULL))
 #          0      1   <NA>    Sum
 #2002  53969     54      0  54023
@@ -251,7 +131,7 @@ addmargins(table(sudi$DHBRes, sudi$SUDI, exclude = NULL))
 # DEP
 #
 levels(sudi$Dep06)
-#[1] "0"  "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "10" 
+#[1] "0"  "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "10"
 levels(sudi$Dep06)  <- list("01-08" = c("1","2","3","4","5","6","7","8"),
                             "09-10" = c("9","10"),
                             "Unknown" = "0")
@@ -259,7 +139,7 @@ levels(sudi$Dep06)  <- list("01-08" = c("1","2","3","4","5","6","7","8"),
 #sudi  <- droplevels(sudi)
 levels(sudi$Dep06)
 #[1] "01-08" "09-10"
-table(sudi$Dep06, sudi$SUDI)
+addmargins(table(sudi$Dep06, sudi$SUDI, exclude = NULL))
 #           0      1
 #01-08 573487    351
 #09-10 211074    381
@@ -271,7 +151,7 @@ table(sudi$Dep06, sudi$SUDI)
 # ETH
 #
 levels(sudi$EthPrio)
-#[1] "Asian"           "European"        "Maori"           "MELAA"           "Other"           "Pacific Peoples" "Unknown"    
+#[1] "Asian"           "European"        "Maori"           "MELAA"           "Other"           "Pacific Peoples" "Unknown"
 levels(sudi$EthPrio)  <- list("Maori" = "Maori",
                         "European or other" = c("European", "Asian", "MELAA", "Other"),
                         "Pacific" = "Pacific Peoples",
@@ -279,8 +159,8 @@ levels(sudi$EthPrio)  <- list("Maori" = "Maori",
 #sudi  <-  sudi[sudi$EthPrio  != "Unknown",]
 #sudi  <- droplevels(sudi)
 levels(sudi$EthPrio)
-#[1] "Maori"             "European or other" "Pacific"     
-table(sudi$EthPrio, sudi$SUDI)
+#[1] "Maori"             "European or other" "Pacific"
+addmargins(table(sudi$EthPrio, sudi$SUDI, exclude = NULL))
 #                       0      1
 #Maori             227142    495
 #European or other 472449    146
@@ -294,11 +174,11 @@ table(sudi$EthPrio, sudi$SUDI)
 ## DHB
 ##
 levels(sudi$DHBRes)
-#[1]  "Auckland"           "Bay of Plenty"      "Canterbury"         "Capital & Coast"    "Capital and Coast" 
-#[6]  "Counties Manukau"   "Hawke's Bay"        "Hutt"               "Lakes"              "MidCentral"        
-#[11] "Nelson Marlborough" "Northland"          "Otago"              "South Canterbury"   "Southern"          
-#[16] "Southland"          "Tairawhiti"         "Taranaki"           "Waikato"            "Wairarapa"         
-#[21] "Waitemata"          "West Coast"         "Whanganui"         
+#[1]  "Auckland"           "Bay of Plenty"      "Canterbury"         "Capital & Coast"    "Capital and Coast"
+#[6]  "Counties Manukau"   "Hawke's Bay"        "Hutt"               "Lakes"              "MidCentral"
+#[11] "Nelson Marlborough" "Northland"          "Otago"              "South Canterbury"   "Southern"
+#[16] "Southland"          "Tairawhiti"         "Taranaki"           "Waikato"            "Wairarapa"
+#[21] "Waitemata"          "West Coast"         "Whanganui"
 levels(sudi$DHBRes) <- list("Nothern" = c("Auckland","Waitemata","Northland","Counties Manukau"),
                             "Midland" = c("Waikato","Lakes","Bay of Plenty","Tairawhiti","Taranaki"),
                             "Central" = c("Hawke's Bay","MidCentral","Whanganui","Capital & Coast", "Capital and Coast",
@@ -310,7 +190,7 @@ levels(sudi$DHBRes) <- list("Nothern" = c("Auckland","Waitemata","Northland","Co
 #sudi  <- droplevels(sudi)
 levels(sudi$DHBRes)
 #[1] "Nothern"  "Midland"  "Central"  "Southern"
-table(sudi$DHBRes, sudi$SUDI)
+addmargins(table(sudi$DHBRes, sudi$SUDI, exclude = NULL))
 #              0      1
 #Nothern  317168    299
 #Midland  155451    192
@@ -323,6 +203,7 @@ table(sudi$DHBRes, sudi$SUDI)
 ##################################
 ##
 # deal with missing data
+row.has.na <- apply(sudi, 1, function(x){any(is.na(x))}); sum(row.has.na);foo <- sudi[!row.has.na,]; rm(row.has.na)
 ##
 t.test(sudi$mage[sudi$SUDI != 1], sudi$mage[sudi$SUDI == 1])
 #Welch Two Sample t-test
