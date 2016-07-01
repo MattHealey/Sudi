@@ -159,10 +159,10 @@ addmargins(table(sudi$dhb, sudi$sudi, exclude = NULL))
 levels(sudi$bw)
 #[1] "<1000"     ">=4500"    "1000-1499" "1500-1999" "2000-2499" "2500-2999" "3000-3499" "3500-3999" "4000-4499"
 #[10] "o"         "Unknown"
-levels(sudi$bw) <- list("<1000" = "<1000",    ">=4500" = ">=4500",   "1000-1499" = "1000-1499",
+levels(sudi$bw) <- list("<1000" = "<1000",   "1000-1499" = "1000-1499",
                         "1500-1999" = "1500-1999", "2000-2499" = "2000-2499", "2500-2999" = "2500-2999",
                         "3000-3499" = "3000-3499", "3500-3999" = "3500-3999", "4000-4499" = "4000-4499",
-                        "Unknown" = c("o", "Unknown"))
+                        ">=4500" = ">=4500", "Unknown" = c("o", "Unknown"))
 sudi  <- droplevels(sudi)
 levels(sudi$bw)
 addmargins(table(sudi$bw, sudi$sudi, exclude = NULL))
@@ -260,12 +260,25 @@ addmargins(table(sudi$dhb, sudi$sudi, exclude = NULL))
 ##
 # DHB DONE
 ####
+
 ##
-# Deal with missing data
-row.has.na <- apply(sudi, 1, function(x){any(is.na(x))}); sum(row.has.na);sudi <- sudi[!row.has.na,]; rm(row.has.na,foo)
+# make a copy at this point for use in uni var analyses. Uncomment line below to create.
+usudi <- sudi
 ##
-#sudi  <-  sudi[sudi$dep  != "Unknown",]
-#sudi  <-  sudi[sudi$dhb  != "Unknown",]
-#sudi  <-  sudi[sudi$eth  != "Unknown",]
-#sudi  <-  sudi[sudi$bw  != "Unknown",]
-#sudi <- droplevels(sudi)
+
+##
+# Trim SUDI df and remove vars not needed in multivar LR
+sudit <- sudi[,c(1,3,5,6,7,8,10)]
+##
+
+##
+# Deal with missing data, ie remove them!
+row.has.na <- apply(sudit, 1, function(x){any(is.na(x))}); sum(row.has.na);sudit <- sudit[!row.has.na,]; rm(row.has.na,foo)
+##
+# Get rid of unknowns
+##
+sudit  <-  sudit[sudit$dep  != "Unknown",]
+sudit  <-  sudit[sudit$dhb  != "Unknown",]
+sudit  <-  sudit[sudit$eth  != "Unknown",]
+sudit  <-  sudit[sudit$bw  != "Unknown",]
+sudit <- droplevels(sudit)

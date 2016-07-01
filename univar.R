@@ -1,13 +1,19 @@
+options(scipen = 999)
+contrasts(usudi$yod)  <- contr.treatment(levels(usudi$yod), base=which(levels(usudi$yod) == "2014"))
+contrasts(usudi$dhb)  <- contr.treatment(levels(usudi$dhb), base=which(levels(usudi$dhb) == "Southern"))
+contrasts(usudi$eth)  <- contr.treatment(levels(usudi$eth), base=which(levels(usudi$eth) == "European or other"))
+contrasts(usudi$sex)  <- contr.treatment(levels(usudi$sex), base=which(levels(usudi$sex) == "F"))
+contrasts(usudi$bw)   <- contr.treatment(levels(usudi$bw), base=which(levels(usudi$bw) == "2500-2999"))
+contrasts(usudi$dep)   <- contr.treatment(levels(usudit$dep), base=which(levels(usudit$dep) == "01-08"))
 ## Maternal age
 ## create factor for mage
-
 age <- function(dob, age.day, units = "years", floor = TRUE) {
      calc.age = interval(dob, age.day) / duration(num = 1, units = units)
      if (floor) return(as.integer(floor(calc.age)))
      return(calc.age)
 }
-sudi$mage <- age(dob = sudi$mdob, age.day = sudi$dob)
-addmargins(table(sudi$mage, sudi$sudi, exclude = NULL))
+usudi$mage <- age(dob = usudi$mdob, age.day = usudi$dob)
+addmargins(table(usudi$mage, usudi$sudi, exclude = NULL))
 #          0      1   <NA>    Sum
 #11        1      0      0      1
 #12        5      0      0      5
@@ -72,7 +78,7 @@ age.cat <- function(x, lower = 0, upper, by = 5,
      cut(floor(x), breaks = c(seq(lower, upper, by = by), Inf),
          right = FALSE, labels = labs)
 }
-addmargins(table(age.cat(sudi$mage, lower = 10,upper = 80), sudi$sudi, exclude = NULL))
+addmargins(table(age.cat(usudi$mage, lower = 10,upper = 80), usudi$sudi, exclude = NULL))
 #           0      1   <NA>    Sum
 #10-14    403      2      0    405
 #15-19  53421    108      0  53529
@@ -91,18 +97,18 @@ addmargins(table(age.cat(sudi$mage, lower = 10,upper = 80), sudi$sudi, exclude =
 #80+        0      0      0      0
 #<NA>       8    158      0    166
 #Sum   785567    733      0 786300
-sudi$magecat <- age.cat(sudi$mage, lower = 10,upper = 80)
-levels(sudi$magecat)
+usudi$magecat <- age.cat(usudi$mage, lower = 10,upper = 80)
+levels(usudi$magecat)
 #[1] "10-14" "15-19" "20-24" "25-29" "30-34" "35-39" "40-44" "45-49" "50-54" "55-59" "60-64" "65-69" "70-74" "75-79" "80+"
-levels(sudi$magecat)  <- list(">20"   = c("10-14","15-19"),
+levels(usudi$magecat)  <- list(">20"   = c("10-14","15-19"),
                               "20-24" = "20-24",
                               "25-29" = "25-29",
                               "30-34" = "30-34",
                               "35-39" = "35-39",
                               "<40" = c("40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79","80+"))
-sudi <- droplevels(sudi)
-levels(sudi$magecat)
-addmargins(table(sudi$magecat, sudi$sudi, exclude = NULL))
+sudi <- droplevels(usudi)
+levels(usudi$magecat)
+addmargins(table(usudi$magecat, usudi$sudi, exclude = NULL))
 #           0      1   <NA>    Sum
 #>20    53824    110      0  53934
 #20-24 140062    193      0 140255
@@ -113,16 +119,33 @@ addmargins(table(sudi$magecat, sudi$sudi, exclude = NULL))
 #<NA>       8    158      0    166
 #Sum   785567    733      0 786300
 
-t.test(sudi$mage[sudi$sudi != 1], sudi$mage[sudi$sudi == 1])
+s1 <- glm(sudi ~ yod, data = usudi, family = binomial(link = "log"))
+s2 <- glm(sudi ~ bw, data = usudi, family = binomial(link = "log"))
+s3 <- glm(sudi ~ eth, data = usudi, family = binomial(link = "log"))
+s4 <- glm(sudi ~ sex, data = usudi, family = binomial(link = "log"))
+s5 <- glm(sudi ~ dhb, data = usudi, family = binomial(link = "log"))
+s6 <- glm(sudi ~ dep, data = usudi, family = binomial(link = "log"))
+s7 <- glm(sudi ~ magecat, data = usudi, family = binomial(link = "log"))
+s8 <- glm(sudi ~ bwr, data = usudi, family = binomial(link = "log"))
+s9 <- glm(sudi ~ mage, data = usudi, family = binomial(link = "log"))
+library(doBy)
+orderBy(~ AIC, AIC(s1,s2,s3,s4,s5,s6,s7))
+
+m <- s2
+se <- sqrt(diag(vcov(m)))
+# table of estimates with 95% CI
+(tab <- cbind(Est = coef(m), LL = coef(m) - 1.96 * se, UL = coef(m) + 1.96 *se))
+exp(tab)
+
+t.test(usudi$mage[usudi$sudi != 1], sudi$mage[usudi$sudi == 1])
 #Welch Two Sample t-test
 #
-#data:  sudi$mage[sudi$SUDI != 1] and sudi$mage[sudi$SUDI == 1]
-#t = 14.961, df = 573.84, p-value < 2.2e-16
+#data:  usudi$mage[usudi$sudi != 1] and sudi$mage[usudi$sudi == 1]
+#t = 15.01, df = 574.84, p-value < 2.2e-16
 #alternative hypothesis: true difference in means is not equal to 0
 #95 percent confidence interval:
-#     3.349368 4.361657
+#  3.357628 4.368594
 #sample estimates:
-#     mean of x mean of y
-#      29.22485  25.36174
-#
-summary(s1 <- glm(sudi ~ yod + bw + dhb + dep + sex + eth, data = sudi, family = "binomial"))
+#  mean of x mean of y 
+#29.22485  25.36174 
+
