@@ -10,4 +10,4 @@ contrasts(sudit$bw)   <- contr.treatment(levels(sudit$bw), base=which(levels(sud
 contrasts(sudit$dep)   <- contr.treatment(levels(sudit$dep), base=which(levels(sudit$dep) == "01-08"))
 s1   <- glm(sudi ~ yod + bw + dhb + dep + sex + eth, data = sudit, family = "binomial" )
 sjp.glm(s1)
-screenreg(s1, single.row = T)
+screenreg(s2, single.row = T)

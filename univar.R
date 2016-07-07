@@ -120,7 +120,7 @@ addmargins(table(usudi$magecat, usudi$sudi, exclude = NULL))
 #Sum   785567    733      0 786300
 
 s1 <- glm(sudi ~ yod, data = usudi, family = binomial(link = "log"))
-s2 <- glm(sudi ~ bw, data = usudi, family = binomial(link = "log"))
+s2 <- glm(sudi ~ bw,  data = usudi, family = binomial(link = "log"))
 s3 <- glm(sudi ~ eth, data = usudi, family = binomial(link = "log"))
 s4 <- glm(sudi ~ sex, data = usudi, family = binomial(link = "log"))
 s5 <- glm(sudi ~ dhb, data = usudi, family = binomial(link = "log"))
@@ -131,7 +131,7 @@ s9 <- glm(sudi ~ mage, data = usudi, family = binomial(link = "log"))
 library(doBy)
 orderBy(~ AIC, AIC(s1,s2,s3,s4,s5,s6,s7))
 
-m <- s2
+m <- s1
 se <- sqrt(diag(vcov(m)))
 # table of estimates with 95% CI
 (tab <- cbind(Est = coef(m), LL = coef(m) - 1.96 * se, UL = coef(m) + 1.96 *se))
