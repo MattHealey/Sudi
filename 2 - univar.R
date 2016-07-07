@@ -128,21 +128,6 @@ addmargins(table(usudi$magecat, usudi$sudi, exclude = NULL))
 #<NA>       8    158      0    166
 #Sum   785567    733      0 786300
 
-<<<<<<< HEAD
-s1 <- glm(sudi ~ yod, data = usudi, family = binomial(link = "log"))
-s2 <- glm(sudi ~ bw,  data = usudi, family = binomial(link = "log"))
-s3 <- glm(sudi ~ eth, data = usudi, family = binomial(link = "log"))
-s4 <- glm(sudi ~ sex, data = usudi, family = binomial(link = "log"))
-s5 <- glm(sudi ~ dhb, data = usudi, family = binomial(link = "log"))
-s6 <- glm(sudi ~ dep, data = usudi, family = binomial(link = "log"))
-s7 <- glm(sudi ~ magecat, data = usudi, family = binomial(link = "log"))
-s8 <- glm(sudi ~ bwr, data = usudi, family = binomial(link = "log"))
-s9 <- glm(sudi ~ mage, data = usudi, family = binomial(link = "log"))
-library(doBy)
-orderBy(~ AIC, AIC(s1,s2,s3,s4,s5,s6,s7))
-
-m <- s1
-=======
 
 ###
 ## Year of Death
@@ -192,7 +177,6 @@ plot(bw.ht)
 plot(allEffects(s2))
 plot(margins(s2b)[[1]])
 m <- s2
->>>>>>> 95470c40854f6d406ae352aa7c32c54b970d205d
 se <- sqrt(diag(vcov(m)))
 # table of estimates with 95% CI
 (tab <- cbind(Est = coef(m), LL = coef(m) - 1.96 * se, UL = coef(m) + 1.96 *se))
