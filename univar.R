@@ -8,11 +8,10 @@ library(margins)
 usudi$bwr[usudi$bwr==0] <- NA
 contrasts(usudi$yod)  <- contr.treatment(levels(usudi$yod), base=which(levels(usudi$yod) == "2014"))
 contrasts(usudi$dhb)  <- contr.treatment(levels(usudi$dhb), base=which(levels(usudi$dhb) == "Southern"))
-contrasts(usudi$eth)  <- contr.treatment(levels(usudi$eth), base=which(levels(usudi$eth) == "European or other"))
+contrasts(usudi$eth)  <- contr.treatment(levels(usudi$eth), base=which(levels(usudi$eth) == "European_or_other"))
 contrasts(usudi$sex)  <- contr.treatment(levels(usudi$sex), base=which(levels(usudi$sex) == "F"))
-contrasts(usudi$bw)   <- contr.treatment(levels(usudi$bw), base=which(levels(usudi$bw) == "2500-2999"))
 contrasts(usudi$dep)   <- contr.treatment(levels(usudi$dep), base=which(levels(usudi$dep) == "01-08"))
-contrasts(usudi$magecat)   <- contr.treatment(levels(usudi$magecat), base=which(levels(usudi$magecat) == "<40"))
+
 ## Maternal age
 ## create factor for mage
 age <- function(dob, age.day, units = "years", floor = TRUE) {
@@ -109,12 +108,12 @@ addmargins(table(age.cat(usudi$mage, lower = 10,upper = 80), usudi$sudi, exclude
 usudi$magecat <- age.cat(usudi$mage, lower = 10,upper = 80)
 levels(usudi$magecat)
 #[1] "10-14" "15-19" "20-24" "25-29" "30-34" "35-39" "40-44" "45-49" "50-54" "55-59" "60-64" "65-69" "70-74" "75-79" "80+"
-levels(usudi$magecat)  <- list(">20"   = c("10-14","15-19"),
+levels(usudi$magecat)  <- list("under20"   = c("10-14","15-19"),
                               "20-24" = "20-24",
                               "25-29" = "25-29",
                               "30-34" = "30-34",
                               "35-39" = "35-39",
-                              "<40" = c("40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79","80+"))
+                              "over40" = c("40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79","80+"))
 sudi <- droplevels(usudi)
 levels(usudi$magecat)
 addmargins(table(usudi$magecat, usudi$sudi, exclude = NULL))
@@ -127,8 +126,9 @@ addmargins(table(usudi$magecat, usudi$sudi, exclude = NULL))
 #<40    30901      8      0  30909
 #<NA>       8    158      0    166
 #Sum   785567    733      0 786300
+contrasts(usudi$magecat)   <- contr.treatment(levels(usudi$magecat), base=which(levels(usudi$magecat) == "over40"))
 
-<<<<<<< HEAD
+
 s1 <- glm(sudi ~ yod, data = usudi, family = binomial(link = "log"))
 s2 <- glm(sudi ~ bw,  data = usudi, family = binomial(link = "log"))
 s3 <- glm(sudi ~ eth, data = usudi, family = binomial(link = "log"))
@@ -141,8 +141,6 @@ s9 <- glm(sudi ~ mage, data = usudi, family = binomial(link = "log"))
 library(doBy)
 orderBy(~ AIC, AIC(s1,s2,s3,s4,s5,s6,s7))
 
-m <- s1
-=======
 
 ###
 ## Year of Death
@@ -169,6 +167,20 @@ se <- sqrt(diag(vcov(m)))
 # table of estimates with 95% CI
 (tab <- cbind(Est = coef(m), LL = coef(m) - 1.96 * se, UL = coef(m) + 1.96 *se))
 exp(tab)
+#Est           LL           UL
+#(Intercept) 0.0006884563 0.0005050495 0.0009384666
+#yod2002     1.4519065953 0.9648031975 2.1849355049
+#yod2003     1.6042566267 1.0782473193 2.3868729171
+#yod2004     1.5407978031 1.0355920731 2.2924643127
+#yod2005     1.2651144223 0.8364064852 1.9135606069
+#yod2006     1.7167325587 1.1654455220 2.5287931717
+#yod2007     1.4548079293 0.9813302382 2.1567317799
+#yod2008     1.4497370441 0.9779094532 2.1492148277
+#yod2009     1.4499473158 0.9757329670 2.1546337881
+#yod2010     1.3965287039 0.9386195084 2.0778306900
+#yod2011     1.2659600051 0.8412309169 1.9051305681
+#yod2012     0.9392033882 0.6060188657 1.4555702047
+#yod2013     1.0737210826 0.6998363295 1.6473522659
 
 ###
 ## Birth Weight
@@ -177,33 +189,46 @@ addmargins(table(usudi$bw, usudi$sudi, exclude = NULL))
 foo <- usudi[usudi$bw != "Unknown",]; foo <- droplevels(foo)
 contrasts(foo$bw)   <- contr.treatment(levels(foo$bw), base=which(levels(foo$bw) == "over4500"))
 summary(s2 <- glm(sudi ~ bw,  data = foo, family = binomial(link = "log")))
-s2b <- glm(sudi ~ bw,  data = foo, family = binomial(link = "log"))
+s2b <- glm(sudi ~ 0 + bw,  data = foo, family = binomial(link = "log"))
 anova(s2, test = "Chisq")
 #Analysis of Deviance Table
 #Model: binomial, link: log
 #Response: sudi
 #Terms added sequentially (first to last)
 #Df Deviance Resid. Df Resid. Dev              Pr(>Chi)    
-#NULL                786299      11695                          
-#bw    9   299.79    786290      11395 < 0.00000000000000022 ***
+#NULL                785565      11596                          
+#bw    8   279.75    785557      11316 < 0.00000000000000022 ***
 bw.ht <- glht(s2, linfct = mcp(bw = "Tukey"))
 summary(bw.ht)
 plot(bw.ht)
 plot(allEffects(s2))
-plot(margins(s2b)[[1]])
+plot(margins(s2b, type = "link")[[1]])
+plot(margins(s2, type = "link")[[1]])
 m <- s2
->>>>>>> 95470c40854f6d406ae352aa7c32c54b970d205d
 se <- sqrt(diag(vcov(m)))
 # table of estimates with 95% CI
 (tab <- cbind(Est = coef(m), LL = coef(m) - 1.96 * se, UL = coef(m) + 1.96 *se))
 exp(tab)
+#                     Est           LL             UL
+#(Intercept)  0.000095225 0.0000238706   0.0003798732
+#bwunder1000 16.842732491 3.4073282582  83.2551536765
+#bw1000-1499 31.475104241 7.1709458784 138.1522331592
+#bw1500-1999 35.643423701 8.5624717940 148.3746380380
+#bw2000-2499 28.418252763 7.0007755510 115.3582319861
+#bw2500-2999 17.313116111 4.3058396852  69.6133649608
+#bw3000-3499  9.880542360 2.4628593436  39.6389333340
+#bw3500-3999  5.525348281 1.3707497435  22.2720987346
+#bw4000-4499  4.277268915 1.0360875570  17.6578024183
+
+
+
 
 ###
 ## Ethnicity
 #
 addmargins(table(usudi$eth, usudi$sudi, exclude = NULL))
 foo <- usudi[usudi$eth != "Unknown",]; foo <- droplevels(foo)
-contrasts(foo$eth)  <- contr.treatment(levels(foo$eth), base=which(levels(foo$eth) == "European_and_other"))
+contrasts(foo$eth)  <- contr.treatment(levels(foo$eth), base=which(levels(foo$eth) == "European_or_other"))
 summary(s3 <- glm(sudi ~ eth, data = foo, family = binomial(link = "log")))
 s3b <- glm(sudi ~ 0 + eth, data = foo, family = binomial(link = "log"))
 anova(s3, test = "Chisq")
@@ -212,18 +237,23 @@ anova(s3, test = "Chisq")
 #Response: sudi
 #Terms added sequentially (first to last)
 #Df Deviance Resid. Df Resid. Dev              Pr(>Chi)    
-#NULL                786299      11695                          
-#eth   3   541.94    786296      11153 < 0.00000000000000022 ***
+#NULL                785716      11680                          
+#eth   2   541.64    785714      11138 < 0.00000000000000022 ***
 eth.ht <- glht(s3, linfct = mcp(eth = "Tukey"))
 summary(eth.ht)
 plot(eth.ht)
 plot(allEffects(s3))
 plot(margins(s3b)[[1]])
+plot(margins(s3)[[1]])
 m <- s3
 se <- sqrt(diag(vcov(m)))
 # table of estimates with 95% CI
 (tab <- cbind(Est = coef(m), LL = coef(m) - 1.96 * se, UL = coef(m) + 1.96 *se))
 exp(tab)
+#                     Est           LL          UL
+#(Intercept) 0.0003089326 0.0002626802 0.000363329
+#ethMaori    7.0387997870 5.8527777958 8.465160334
+#ethPacific  3.4457815638 2.6524246786 4.476436478
 
 ###
 ## Sex
@@ -243,12 +273,16 @@ sex.ht <- glht(s4, linfct = mcp(sex = "Tukey"))
 summary(sex.ht)
 plot(sex.ht)
 plot(allEffects(s4))
-plot(margins(sb)[[1]])
+plot(margins(s4b)[[1]])
 m <- s4
 se <- sqrt(diag(vcov(m)))
 # table of estimates with 95% CI
 (tab <- cbind(Est = coef(m), LL = coef(m) - 1.96 * se, UL = coef(m) + 1.96 *se))
 exp(tab)
+#                     Est           LL           UL
+#(Intercept) 0.0008151365 0.0007295571 0.0009107545
+#sexM        1.2798616806 1.1056158159 1.4815688216
+
 
 ###
 ## Location
@@ -269,12 +303,19 @@ dhb.ht <- glht(s5, linfct = mcp(dhb = "Tukey"))
 summary(dhb.ht)
 plot(dhb.ht)
 plot(allEffects(s5))
-plot(margins(s5b){{1}})
+plot(margins(s5)[[1]])
+plot(margins(s5b)[[1]])
 m <- s5
 se <- sqrt(diag(vcov(m)))
 # table of estimates with 95% CI
 (tab <- cbind(Est = coef(m), LL = coef(m) - 1.96 * se, UL = coef(m) + 1.96 *se))
 exp(tab)
+#                     Est           LL          UL
+#(Intercept) 0.0009417619 0.0008408861 0.001054739
+#dhbMidland  1.3098096206 1.0927743020 1.569950208
+#dhbCentral  1.0529486731 0.8658995271 1.280403642
+#dhbSouthern 0.6041930829 0.4778598717 0.763925374
+
 
 ###
 ## Deprivation
@@ -289,8 +330,8 @@ anova(s6, test = "Chisq")
 #Response: sudi
 #Terms added sequentially (first to last)
 #Df Deviance Resid. Df Resid. Dev              Pr(>Chi)    
-#NULL                786298      11681                          
-#dep   2   208.56    786296      11472 < 0.00000000000000022 ***
+#NULL                785292      11679                          
+#dep   1   206.68    785291      11472 < 0.00000000000000022 ***
 dep.ht <- glht(s6, linfct = mcp(dep = "Tukey"))
 summary(dep.ht)
 plot(dep.ht)
@@ -300,6 +341,9 @@ se <- sqrt(diag(vcov(m)))
 # table of estimates with 95% CI
 (tab <- cbind(Est = coef(m), LL = coef(m) - 1.96 * se, UL = coef(m) + 1.96 *se))
 exp(tab)
+#                     Est           LL           UL
+#(Intercept) 0.0006116709 0.0005509314 0.0006791068
+#dep09-10    2.9457046786 2.5482970779 3.4050880992
 
 ###
 ## Maternal age - categorical
@@ -318,12 +362,21 @@ magec.ht <- glht(s7, linfct = mcp(magecat = "Tukey"))
 summary(magec.ht)
 plot(magec.ht)
 plot(allEffects(s7))
+plot(margins(s7)[[1]])
 plot(margins(s7b)[[1]])
 m <- s7
 se <- sqrt(diag(vcov(m)))
 # table of estimates with 95% CI
 (tab <- cbind(Est = coef(m), LL = coef(m) - 1.96 * se, UL = coef(m) + 1.96 *se))
 exp(tab)
+#                        Est           LL            UL
+#(Intercept)    0.0002588243 0.0001294476  0.0005175067
+#magecatunder20 7.8799783067 3.8448787357 16.1498092353
+#magecat20-24   5.3165992300 2.6215406609 10.7822959962
+#magecat25-29   2.5353559692 1.2412824514  5.1785392462
+#magecat30-34   1.3954781331 0.6755309491  2.8827091087
+#magecat35-39   1.5037203419 0.7150663625  3.1621888332
+
 
 ###
 ## Birth weight - numeric
