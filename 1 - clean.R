@@ -1,3 +1,4 @@
+options(scipen = 999)
 library(lubridate)
 sudi <- read.csv("Dataset for LR.csv")
 str(sudi)
@@ -263,22 +264,22 @@ addmargins(table(sudi$dhb, sudi$sudi, exclude = NULL))
 
 ##
 # make a copy at this point for use in uni var analyses. Uncomment line below to create.
-usudi <- sudi
+sudi.v1.copy  <- sudi
 ##
 
 ##
 # Trim SUDI df and remove vars not needed in multivar LR
-sudit <- sudi[,c(1,3,5,6,7,8,10)]
+sudi <- sudi[,c(1,3,5,6,7,8,10)]
 ##
 
 ##
 # Deal with missing data, ie remove them!
-row.has.na <- apply(sudit, 1, function(x){any(is.na(x))}); sum(row.has.na);sudit <- sudit[!row.has.na,]; rm(row.has.na,foo)
+row.has.na <- apply(sudi, 1, function(x){any(is.na(x))}); sum(row.has.na);sudi <- sudi[!row.has.na,]; rm(row.has.na,foo)
 ##
 # Get rid of unknowns
 ##
-sudit  <-  sudit[sudit$dep  != "Unknown",]
-sudit  <-  sudit[sudit$dhb  != "Unknown",]
-sudit  <-  sudit[sudit$eth  != "Unknown",]
-sudit  <-  sudit[sudit$bw  != "Unknown",]
-sudit <- droplevels(sudit)
+sudi  <-  sudi[sudi$dep  != "Unknown",]
+sudi  <-  sudi[sudi$dhb  != "Unknown",]
+sudi  <-  sudi[sudi$eth  != "Unknown",]
+sudi  <-  sudi[sudi$bw  != "Unknown",]
+sudi <- droplevels(sudi)
