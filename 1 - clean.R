@@ -1,6 +1,7 @@
 options(scipen = 999)
 library(lubridate)
-sudi <- read.csv("Dataset for LR.csv")
+#csudi <- read.csv("Dataset for LR.csv")
+sudi <- csudi
 str(sudi)
 #'data.frame':	786300 obs. of  10 variables:
 #$ YearOfDeath : int  2002 2002 2002 2002 2002 2002 2002 2002 2002 2002 ...
@@ -35,8 +36,11 @@ head(sudi)
 # NAs?
 ##
 # rename foo to sudi to run with NA removed set
-row.has.na <- apply(sudi, 1, function(x){any(is.na(x))}); sum(row.has.na);foo <- sudi[!row.has.na,]; rm(row.has.na)
+#row.has.na <- apply(sudi, 1, function(x){any(is.na(x))}); sum(row.has.na);foo <- sudi[!row.has.na,]; rm(row.has.na)
 #[1] 167
+sapply(sudi,function(x) sum(is.na(x)))
+#yod  dob   bw  bwr  dhb  dep  sex  eth mdob sudi 
+#  0    1    0    0    0    1    0    0  165    0 
 ##
 # None in sudi$sudi
 addmargins(table(sudi$sudi, exclude = NULL))
@@ -160,26 +164,26 @@ addmargins(table(sudi$dhb, sudi$sudi, exclude = NULL))
 levels(sudi$bw)
 #[1] "<1000"     ">=4500"    "1000-1499" "1500-1999" "2000-2499" "2500-2999" "3000-3499" "3500-3999" "4000-4499"
 #[10] "o"         "Unknown"
-levels(sudi$bw) <- list("<1000" = "<1000",   "1000-1499" = "1000-1499",
-                        "1500-1999" = "1500-1999", "2000-2499" = "2000-2499", "2500-2999" = "2500-2999",
-                        "3000-3499" = "3000-3499", "3500-3999" = "3500-3999", "4000-4499" = "4000-4499",
-                        ">=4500" = ">=4500", "Unknown" = c("o", "Unknown"))
+levels(sudi$bw) <- list("under1000" = "<1000",   "1000_1499" = "1000-1499",
+                        "1500_1999" = "1500-1999", "2000_2499" = "2000-2499", "2500_2999" = "2500-2999",
+                        "3000_3499" = "3000-3499", "3500_3999" = "3500-3999", "4000_4499" = "4000-4499",
+                        "over4500" = ">=4500", "Unknown" = c("o", "Unknown"))
 sudi  <- droplevels(sudi)
 levels(sudi$bw)
 addmargins(table(sudi$bw, sudi$sudi, exclude = NULL))
 #               0      1   <NA>    Sum
-#<1000       3721      6      0   3727
-#>=4500     20969      2      0  20971
-#1000-1499   4651     11      0   4662
-#1500-1999   9366     23      0   9389
-#2000-2499  29037     61      0  29098
-#2500-2999 105743    125      0 105868
-#3000-3499 259611    201      0 259812
-#3500-3999 252212    114      0 252326
-#4000-4499  98030     30      0  98060
-#Unknown      670      1      0    671
+#under1000   3735      6      0   3741
+#1000-1499   4657     14      0   4671
+#1500-1999   9396     32      0   9428
+#2000-2499  29114     79      0  29193
+#2500-2999 105973    175      0 106148
+#3000-3499 260151    245      0 260396
+#3500-3999 252646    133      0 252779
+#4000-4499  98167     40      0  98207
+#over4500   21001      2      0  21003
+#Unknown      727      7      0    734
 #<NA>           0      0      0      0
-#Sum       784010    574      0 784584
+#Sum       785567    733      0 786300
 ##
 # BW END
 ###
@@ -212,7 +216,7 @@ addmargins(table(sudi$dep, sudi$sudi, exclude = NULL))
 levels(sudi$eth)
 #[1] "Asian"           "European"        "Maori"           "MELAA"           "Other"           "Pacific Peoples" "Unknown"
 levels(sudi$eth)  <- list("Maori" = "Maori",
-                              "European or other" = c("European", "Asian", "MELAA", "Other"),
+                              "European_or_other" = c("European", "Asian", "MELAA", "Other"),
                               "Pacific" = "Pacific Peoples",
                               "Unknown" = "Unknown")
 sudi  <- droplevels(sudi)
