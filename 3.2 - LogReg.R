@@ -1,0 +1,46 @@
+source("1 - clean.R")
+library(sjPlot)
+library(texreg)
+library(margins)
+library(lme4)
+contrasts(sudi$yod)  <- contr.treatment(levels(sudi$yod), base=which(levels(sudi$yod) == "2014"))
+contrasts(sudi$dhb)  <- contr.treatment(levels(sudi$dhb), base=which(levels(sudi$dhb) == "Southern"))
+contrasts(sudi$eth)  <- contr.treatment(levels(sudi$eth), base=which(levels(sudi$eth) == "European or other"))
+contrasts(sudi$sex)  <- contr.treatment(levels(sudi$sex), base=which(levels(sudi$sex) == "F"))
+contrasts(sudi$bw)   <- contr.treatment(levels(sudi$bw), base=which(levels(sudi$bw) == "2500-2999"))
+contrasts(sudi$dep)   <- contr.treatment(levels(sudi$dep), base=which(levels(sudi$dep) == "01-08"))
+sudi <-  sudi.v1.copy
+x <-  sudi[sample(nrow(sudi), 200000), ]
+x <- x[1]
+y <-  sudi[sample(nrow(sudi), 200000), ]
+y <- y[10]
+s0 <- glm(y~1, family = binomial)
+s1 <- glm(y~x, family = binomial(link = "logit"))
+s2 <- glm(y~x, family = binomial(link = "cloglog"))
+s3 <- glm(y~x, family = quasibinomial(link = "log"))
+library(doBy)
+orderBy(~ AIC, AIC(s0,s1,s2,s3))
+plot(x, fitted(s1))
+points(x,fitted(s1),col=2)
+plot(x,y,ylim=c(-0.2,1.2))
+points(x,fitted(s1),col=2,pch="+")
+points(x,fitted(s2),col=3,pch="o")
+
+x2= 2*(logLik(s1)-logLik(s0)) # log-likelihood ratio test statistic
+as.numeric(x2)
+pval=1-pchisq(x2,2)
+as.numeric(pval)
+
+s.dhb <- glm(sudi ~ bw, data = sudi, family = binomial(link = "logit"))
+s.eth <- glm(sudi ~ eth, data = sudi, family = binomial(link = "logit"))
+s.sex <- glm(sudi ~ sex, data = sudi, family = binomial(link = "logit"))
+s.dhb <- glm(sudi ~ dhb, data = sudi, family = binomial(link = "logit"))
+s.dep <- glm(sudi ~ dep, data = sudi, family = binomial(link = "logit"))
+s1   <- glm(sudi ~ yod + bw + dhb + dep + sex + eth, data = sudi, family = "binomial" )
+sjp.glm(s1)
+screenreg(s1, single.row = T)
+xtabs(~ yod + sex, data = sudi)
+xtabs(~ yod + bw, data = sudi)
+xtabs(~ yod + eth, data = sudi)
+xtabs(~ yod + dhb, data = sudi)
+xtabs(~ yod + dep, data = sudi)
