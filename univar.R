@@ -4,7 +4,7 @@ contrasts(usudi$dhb)  <- contr.treatment(levels(usudi$dhb), base=which(levels(us
 contrasts(usudi$eth)  <- contr.treatment(levels(usudi$eth), base=which(levels(usudi$eth) == "European or other"))
 contrasts(usudi$sex)  <- contr.treatment(levels(usudi$sex), base=which(levels(usudi$sex) == "F"))
 contrasts(usudi$bw)   <- contr.treatment(levels(usudi$bw), base=which(levels(usudi$bw) == "2500-2999"))
-contrasts(usudi$dep)   <- contr.treatment(levels(usudit$dep), base=which(levels(usudit$dep) == "01-08"))
+contrasts(usudi$dep)   <- contr.treatment(levels(usudit$dep), base=which(levels(usudi$dep) == "01-08"))
 ## Maternal age
 ## create factor for mage
 age <- function(dob, age.day, units = "years", floor = TRUE) {
@@ -119,7 +119,7 @@ addmargins(table(usudi$magecat, usudi$sudi, exclude = NULL))
 #<NA>       8    158      0    166
 #Sum   785567    733      0 786300
 
-s1 <- glm(sudi ~ yod, data = usudi, family = binomial(link = "log"))
+s2 <- glm(sudi ~ yod, data = usudi, family = binomial(link = "logit"))
 s2 <- glm(sudi ~ bw, data = usudi, family = binomial(link = "log"))
 s3 <- glm(sudi ~ eth, data = usudi, family = binomial(link = "log"))
 s4 <- glm(sudi ~ sex, data = usudi, family = binomial(link = "log"))
@@ -146,6 +146,6 @@ t.test(usudi$mage[usudi$sudi != 1], sudi$mage[usudi$sudi == 1])
 #95 percent confidence interval:
 #  3.357628 4.368594
 #sample estimates:
-#  mean of x mean of y 
-#29.22485  25.36174 
+#  mean of x mean of y
+#29.22485  25.36174
 
