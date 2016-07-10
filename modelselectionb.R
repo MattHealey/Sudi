@@ -1,13 +1,13 @@
 library(MASS)
 ## Create vectors for outcome and predictors
 outcome <- c("sudi")
-predictors <- c("yod","bw","dhb","dep","sex","eth")
+predictors <- c("bw","dep","sex","eth")
 dataset    <- sudit
 ## The lines below should not need modification.
 ## Create list of models
 list.of.models <- lapply(seq_along((predictors)), function(n) {
   left.hand.side  <- outcome
-  right.hand.side <- apply(X = combn(predictors, n), MARGIN = 2, paste, collapse = " + ")
+  right.hand.side <- apply(X = combn(predictors, n), MARGIN = 2, paste, collapse = " * ")
   paste(left.hand.side, right.hand.side, sep = "  ~  ")
 })
 ## Convert to a vector
@@ -27,5 +27,5 @@ result <- do.call(rbind, list.of.fits)
 ## Sort and print
 library(doBy)
 orderBy(~ AIC, result)
-write.csv(result, "model results.csv")
-rm(list.of.fits,list.of.models,offs,outcome,predictors,vector.of.models, dataset)
+write.csv(result, "model results1.csv")
+rm(list.of.fits,list.of.models,outcome,predictors,vector.of.models, dataset, result)

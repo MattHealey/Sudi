@@ -38,8 +38,8 @@ head(sudi)
 #row.has.na <- apply(sudi, 1, function(x){any(is.na(x))}); sum(row.has.na);foo <- sudi[!row.has.na,]; rm(row.has.na)
 #[1] 167
 sapply(sudi,function(x) sum(is.na(x)))
-#yod  dob   bw  bwr  dhb  dep  sex  eth mdob sudi 
-#  0    1    0    0    0    1    0    0  165    0 
+#yod  dob   bw  bwr  dhb  dep  sex  eth mdob sudi
+#  0    1    0    0    0    1    0    0  165    0
 ##
 # None in sudi$sudi
 addmargins(table(sudi$sudi, exclude = NULL))
@@ -192,12 +192,12 @@ addmargins(table(sudi$bw, sudi$sudi, exclude = NULL))
 #
 levels(sudi$dep)
 #[1] "0"  "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "10"
-levels(sudi$dep)  <- list("01-08" = c("1","2","3","4","5","6","7","8"),
-                            "09-10" = c("9","10"),
+levels(sudi$dep)  <- list("01_08" = c("1","2","3","4","5","6","7","8"),
+                            "09_10" = c("9","10"),
                             "Unknown" = "0")
 sudi  <- droplevels(sudi)
 levels(sudi$dep)
-#[1] "01-08" "09-10"
+#[1] "01-08" "09-10" "Unknown"
 addmargins(table(sudi$dep, sudi$sudi, exclude = NULL))
 #             0      1   <NA>    Sum
 #01-08   573487    351      0 573838

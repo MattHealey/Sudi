@@ -10,7 +10,7 @@ contrasts(usudi$yod)  <- contr.treatment(levels(usudi$yod), base=which(levels(us
 contrasts(usudi$dhb)  <- contr.treatment(levels(usudi$dhb), base=which(levels(usudi$dhb) == "Southern"))
 contrasts(usudi$eth)  <- contr.treatment(levels(usudi$eth), base=which(levels(usudi$eth) == "European_or_other"))
 contrasts(usudi$sex)  <- contr.treatment(levels(usudi$sex), base=which(levels(usudi$sex) == "F"))
-contrasts(usudi$dep)   <- contr.treatment(levels(usudi$dep), base=which(levels(usudi$dep) == "01-08"))
+contrasts(usudi$dep)   <- contr.treatment(levels(usudi$dep), base=which(levels(usudi$dep) == "01_08"))
 
 ## Maternal age
 ## create factor for mage
@@ -127,7 +127,7 @@ addmargins(table(usudi$magecat, usudi$sudi, exclude = NULL))
 #<NA>       8    158      0    166
 #Sum   785567    733      0 786300
 contrasts(usudi$magecat)   <- contr.treatment(levels(usudi$magecat), base=which(levels(usudi$magecat) == "over40"))
-
+rm(age,age.cat)
 
 s1 <- glm(sudi ~ yod, data = usudi, family = binomial(link = "log"))
 s2 <- glm(sudi ~ bw,  data = usudi, family = binomial(link = "log"))
@@ -153,8 +153,8 @@ anova(s1, test = "Chisq")
 #Model: binomial, link: log
 #Response: sudi
 #Terms added sequentially (first to last)
-#Df Deviance Resid. Df Resid. Dev Pr(>Chi)  
-#NULL                786299      11695           
+#Df Deviance Resid. Df Resid. Dev Pr(>Chi)
+#NULL                786299      11695
 #yod  12   20.823    786287      11674  0.05304 .
 year.ht <- glht(s1, linfct = mcp(yod = "Tukey"))
 summary(year.ht)
@@ -195,8 +195,8 @@ anova(s2, test = "Chisq")
 #Model: binomial, link: log
 #Response: sudi
 #Terms added sequentially (first to last)
-#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)    
-#NULL                785565      11596                          
+#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)
+#NULL                785565      11596
 #bw    8   279.75    785557      11316 < 0.00000000000000022 ***
 bw.ht <- glht(s2, linfct = mcp(bw = "Tukey"))
 summary(bw.ht)
@@ -236,8 +236,8 @@ anova(s3, test = "Chisq")
 #Model: binomial, link: log
 #Response: sudi
 #Terms added sequentially (first to last)
-#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)    
-#NULL                785716      11680                          
+#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)
+#NULL                785716      11680
 #eth   2   541.64    785714      11138 < 0.00000000000000022 ***
 eth.ht <- glht(s3, linfct = mcp(eth = "Tukey"))
 summary(eth.ht)
@@ -266,8 +266,8 @@ anova(s4, test = "Chisq")
 #Model: binomial, link: log
 #Response: sudi
 #Terms added sequentially (first to last)
-#Df Deviance Resid. Df Resid. Dev      Pr(>Chi)    
-#NULL                786299      11695  
+#Df Deviance Resid. Df Resid. Dev      Pr(>Chi)
+#NULL                786299      11695
 #sex   1   11.028    786298      11684 0.0008975 ***
 sex.ht <- glht(s4, linfct = mcp(sex = "Tukey"))
 summary(sex.ht)
@@ -296,8 +296,8 @@ anova(s5, test = "Chisq")
 #Model: binomial, link: log
 #Response: sudi
 #Terms added sequentially (first to last)
-#Df Deviance Resid. Df Resid. Dev      Pr(>Chi)    
-#NULL                785343      11693                   
+#Df Deviance Resid. Df Resid. Dev      Pr(>Chi)
+#NULL                785343      11693
 #dhb   3   40.704    785340      11652 0.000000007555 ***
 dhb.ht <- glht(s5, linfct = mcp(dhb = "Tukey"))
 summary(dhb.ht)
@@ -329,8 +329,8 @@ anova(s6, test = "Chisq")
 #Model: binomial, link: log
 #Response: sudi
 #Terms added sequentially (first to last)
-#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)    
-#NULL                785292      11679                          
+#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)
+#NULL                785292      11679
 #dep   1   206.68    785291      11472 < 0.00000000000000022 ***
 dep.ht <- glht(s6, linfct = mcp(dep = "Tukey"))
 summary(dep.ht)
@@ -355,8 +355,8 @@ anova(s7, test = "Chisq")
 #Model: binomial, link: log
 #Response: sudi
 #Terms added sequentially (first to last)
-#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)    
-#NULL                   786133     9453.2                          
+#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)
+#NULL                   786133     9453.2
 #magecat  5   241.35    786128     9211.8 < 0.00000000000000022 ***
 magec.ht <- glht(s7, linfct = mcp(magecat = "Tukey"))
 summary(magec.ht)
@@ -387,8 +387,8 @@ anova(s8, test = "Chisq")
 #Model: binomial, link: log
 #Response: sudi
 #Terms added sequentially (first to last)
-#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)    
-#NULL                785565      11596                          
+#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)
+#NULL                785565      11596
 #bwr   1   239.59    785564      11356 < 0.00000000000000022 ***
 plot(allEffects(s8))
 m <- s8
@@ -410,8 +410,8 @@ anova(s9, test = "Chisq")
 #Model: binomial, link: log
 #Response: sudi
 #Terms added sequentially (first to last)
-#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)    
-#NULL                786133     9453.2                          
+#Df Deviance Resid. Df Resid. Dev              Pr(>Chi)
+#NULL                786133     9453.2
 #mage  1   226.93    786132     9226.2 < 0.00000000000000022 ***
 plot(allEffects(s9))
 m <- s9
@@ -419,10 +419,10 @@ se <- sqrt(diag(vcov(m)))
 # table of estimates with 95% CI
 (tab <- cbind(Est = coef(m), LL = coef(m) - 1.96 * se, UL = coef(m) + 1.96 *se))
 exp(tab)
-plot(magesudi$mage,magesudi$sudi,xlab="Maternal Age",ylab="Probability of survival") # plot with body size on x-axis and survival (0 or 1) on y-axis
-g=glm(sudi~mage,family=binomial,magesudi) # run a logistic regression model (in this case, generalized linear model with logit link). see ?glm
+plot(usudi$mage,usudi$sudi,xlab="Maternal Age",ylab="Probability of survival") # plot with body size on x-axis and survival (0 or 1) on y-axis
+g=glm(sudi~mage,family=binomial,usudi) # run a logistic regression model (in this case, generalized linear model with logit link). see ?glm
 curve(predict(g,data.frame(mage=x),type="resp"),add=TRUE) # draws a curve based on prediction from logistic regression model
-points(magesudi$mage,fitted(g),pch=20) # optional: you could skip this draws an invisible set of points of body size survival based on a 'fit' to glm model. pch= changes type of dots.
+points(usudi$mage,fitted(g),pch=20) # optional: you could skip this draws an invisible set of points of body size survival based on a 'fit' to glm model. pch= changes type of dots.
 
 library(doBy)
 orderBy(~ AIC, AIC(s1,s2,s3,s4,s5,s6,s7,s8,s9))
@@ -437,8 +437,8 @@ t.test(usudi$mage[usudi$sudi != 1], sudi$mage[usudi$sudi == 1])
 #95 percent confidence interval:
 #  3.357628 4.368594
 #sample estimates:
-#  mean of x mean of y 
-#29.22485  25.36174 
+#  mean of x mean of y
+#29.22485  25.36174
 
 
 plot(predict(s1),residuals(s1),col=c("blue","red")[1+sudi])
